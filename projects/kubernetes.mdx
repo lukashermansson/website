@@ -1,0 +1,33 @@
+---
+title: kubernetes
+year: 2022
+date: '2022-02-14'
+description: Description of kubernetes-cluster and how it is set up on my raspberry-pi
+tech: ['raspberry pi', 'docker', 'kubernetes']
+---
+## Purpose
+The purpose of the kubernetes-cluster was to experiment with gitops-principles in an enterprise-like environment, to simulate how many companies run their platform.
+## Technology
+I am using a kubernetes-distribution called k3s, a distribution that is made to be set up on ARM architecture like the raspberry-pi is.
+
+To get the gitops functionality I am using Flux(v2). This is the mechanism to be able to store all my kustumize yaml-files in a git repository.
+## Gitops
+To run all the apps deployed on the kubernetes-cluster I utilize the advantages of gitops some witch is listed below.
+- A log of all changes is automatically generated.
+- I do not need to log into the cluster, this allows me to secure access to the cluster accordingly, it also forces me to go through git to make changes!
+- The ideal state of the kluster is stored, witch means that a re-installation of the cluster is easier, only a bootstrap of flux is needed and the cluster is re-created
+### Continous deployment
+By configuring flux to look in specific container registries for tags in specific patterns the flux component will automatically put new versions into operation.
+This is also done in a gitops-way where the change is pushed into the git repository and then the changes are put into effect on the cluster like usual.
+
+As of now the website (the one you are reading this post on) configured for automatic deployment though git-ops, only a git-tag is needed in the repository to kick of the events that will put the container into production.
+## Containers I run on the cluster
+In the cluster I run some important components that I want to talk about in this section
+### Traefik
+For my ingress-controller reverse proxy I run Traefik, witch I find fits good in a kubernetes environment, the syntax for the CRD-s that are provided in *Traefik* is nice to work with.
+### Cert-manager
+Another important component is the cert-manager component, this component is what provide the automatic renewal and requesting of the server-certificate that are used in the reverse proxy.
+It is capable to perform ACME challange to prove ownership of the domain, witch is lets-encypt in my current configuration
+### Website
+This website is deployed on kubernetes, it is simply a deployment and a service, and of course ingress-configuration.
+

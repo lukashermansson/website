@@ -1,0 +1,28 @@
+---
+title: Kontrolluppgift
+year: 2023
+date: '2023-06-12'
+description: A rust library for creating and parsing the file format Kontrolluppgift
+tech: ['Rust', 'Open source', 'xml', 'XSD']
+---
+## Purpose
+I did some work generating kontrolluppgift at work, it felt like a perfect project to provide a rust crate for.
+
+You can find the code here fully open source : [Kontrolluppgift](https://github.com/lukashermansson/kontrolluppgift)
+
+## Tech
+I wrote the library in Rust, utilizing custom proc-macros for the heavy repetition the file format requires. Its kind of its own DSL in a way, basically serde specifically for this purpose,
+some inspiration was taken from serde to provide the derive macros, and the accompanied marker annotations.
+
+the proc macro is also available as its own crate because of how rust handles proc-macros, it's only intended to be of use within the kontrolluppgift crate and
+considered to be an implementation detail of the crate.
+
+the parsing and de-serialization is provided by the rust library [quick-xml](https://crates.io/crates/quick-xml)
+
+### Testing
+Testing of the crate is kind of hard, currently its set-up to parse the example files provided by skatteverket.
+As well as serializing one of each of the different variants serializing the struct to xml and then back, and verifying that all information is still intact
+
+### Rust ecosystem
+The crate is available from here: [Kontrolluppgift on crates.io](https://crates.io/crates/kontrolluppgift)
+

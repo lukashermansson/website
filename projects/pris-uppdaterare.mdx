@@ -1,0 +1,36 @@
+---
+title: Price Notifier
+year: 2022
+date: '2022-01-02'
+description: A short description about a quick project i wrote on my free time
+tech: ['Kotlin', 'Spring Boot', 'web-scraping', 'Modular design']
+---
+## Purpose
+The purpose of the price notifier was to keep up to date of the price of my parents-in-law's residence, I offcourse wanted to keep up to date on
+how the price evolved, so I created this little thing.
+
+I decided that the code would be readable for all, please take a look at the code yourself: [PriceNotifier](https://github.com/lukashermansson/priceNotifier)
+
+## Tech
+I wrote the application in kotlin, as I enjoy writing kotlin and how easy it is to get a quick project like this one done.
+
+I decided that it would be beneficial to abstract a few of the concepts to make this code usable with other sources and other notification mechanisms
+
+
+## Architecture
+Essentially this consists of two parts, the **fetchers**, witch are called on an interval, returning a price for something.
+And the **Notifiers** that registers a subscription to a new highest price
+It is built with spring boot, which in this case handles dependency injection, instantiation of notifiers, configuration and scheduling.
+
+### Fetchers
+Currently, only one fetcher exists, with this system a new one would be easy to add.
+It is responsible for taking a url and knowing how to get the price information
+
+An EraSweden price notifier exists currently, this one scrapes the html of the website to get the price currently.
+
+### Notifiers
+Multiple price notifiers can be registered simultaneously, it is built on an observer pattern, the notifiers are themselves responsible for registering with the Scheduler.
+
+Currently the following notifiers exists:
+Console notifier (Prints to console)
+System tray Notifier (Sends a windows tray notification)

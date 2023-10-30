@@ -1,4 +1,6 @@
 use crate::navbar::Navbar;
+use crate::projects::Projects;
+use crate::projects::Project;
 use leptos::*;
 use leptos_meta::*;
 use crate::error_template::ErrorTemplate;
@@ -18,8 +20,6 @@ pub fn App() -> impl IntoView {
         // sets the document title
         <Title text="Lukas Hermansson"/>
 
-        <Navbar/>
-        <main>
         <Router  fallback=|| {
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
@@ -28,14 +28,17 @@ pub fn App() -> impl IntoView {
             }
             .into_view()
         }>
-
+        <Navbar/>
+        <main>
                 <Routes>
                     <Route path="" view=HomePage/>
+                    <Route path="/projects" view=Projects/>
+                    <Route path="/projects/:id" view=Project/>
                 </Routes>
-        </Router>
         </main>
 
         <Footer/>
+        </Router>
     }
 }
 
@@ -51,17 +54,17 @@ fn HomePage() -> impl IntoView {
             </div>
             <h2 class="font-bold text-3xl text-center m-6">My programming languages</h2>
             <div class="flex place-content-around flex-wrap gap-4">
-                <ProgrammingLang language_name="Javascript" url="assets/javascript.svg"/>
-                <ProgrammingLang language_name="Typescript" url="assets/Typescript-logo.svg"/>
-                <ProgrammingLang language_name="C#" url="assets/c-sharp.svg"/>
-                <ProgrammingLang language_name="Rust" url="assets/Rust-Icon.svg"/>
-                <ProgrammingLang language_name="Java" url="assets/java.svg"/>
-                <ProgrammingLang language_name="CSS" url="assets/CSS3-logo.svg"/>
-                <ProgrammingLang language_name="HTML" url="assets/HTML5_Badge.svg"/>
-                <ProgrammingLang language_name="Sass" url="assets/Sass-logo.svg"/>
-                <ProgrammingLang language_name="Kotlin" url="assets/Kotlin-Icon.svg"/>
-                <ProgrammingLang language_name="PHP" url="assets/PHP-logo.svg"/>
-                <ProgrammingLang language_name="SQL" url="assets/MySQL-logo.svg"/>
+                <ProgrammingLang language_name="Javascript" url="/assets/javascript.svg"/>
+                <ProgrammingLang language_name="Typescript" url="/assets/Typescript-logo.svg"/>
+                <ProgrammingLang language_name="C#" url="/assets/c-sharp.svg"/>
+                <ProgrammingLang language_name="Rust" url="/assets/Rust-Icon.svg"/>
+                <ProgrammingLang language_name="Java" url="/assets/java.svg"/>
+                <ProgrammingLang language_name="CSS" url="/assets/CSS3-logo.svg"/>
+                <ProgrammingLang language_name="HTML" url="/assets/HTML5_Badge.svg"/>
+                <ProgrammingLang language_name="Sass" url="/assets/Sass-logo.svg"/>
+                <ProgrammingLang language_name="Kotlin" url="/assets/Kotlin-Icon.svg"/>
+                <ProgrammingLang language_name="PHP" url="/assets/PHP-logo.svg"/>
+                <ProgrammingLang language_name="SQL" url="/assets/MySQL-logo.svg"/>
             </div>
         </div>
     }

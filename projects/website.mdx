@@ -1,0 +1,24 @@
+---
+title: Website
+year: 2022
+date: '2022-01-09'
+description: Information about the website
+tech: ['Next.js', 'docker', 'typescript', ]
+---
+## Purpose
+To further develop my knowledge about applications in a container-based environment I wanted an application to run in this environment.
+That's when I thought that a website would fit perfectly as a container.
+The website also serves the purpose of being a centralized place to present information about my projects for future reference.
+## Technology
+The website is developed in Next.js with Typescript
+**The technology chosen was made for the reasons listed below**
+
+- The application requires the runtime environment to be able to execute code. A pure React application is able to run when served from a CDN.
+Because I wanted to containerize the application, I wanted that my application would require a more sophisticated runtime environment.
+- That the website would be served as generated files, witch will improve search engine optimization
+- I wanted to further develop my knowledge of Next.js
+### Artifact
+The build pipeline generates a container that contains everything needed to run.
+#### Container
+The generated artifact uses **node:17-alpine** as is base-image
+
