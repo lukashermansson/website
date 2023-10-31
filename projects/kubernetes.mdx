@@ -16,7 +16,7 @@ To run all the apps deployed on the kubernetes-cluster I utilize the advantages 
 - A log of all changes is automatically generated.
 - I do not need to log into the cluster, this allows me to secure access to the cluster accordingly, it also forces me to go through git to make changes!
 - The ideal state of the kluster is stored, witch means that a re-installation of the cluster is easier, only a bootstrap of flux is needed and the cluster is re-created
-### Continous deployment
+### Continuous deployment
 By configuring flux to look in specific container registries for tags in specific patterns the flux component will automatically put new versions into operation.
 This is also done in a gitops-way where the change is pushed into the git repository and then the changes are put into effect on the cluster like usual.
 

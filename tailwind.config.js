@@ -2,7 +2,11 @@
 module.exports = {
   content: ["*.html", "./src/**/*.rs",],
   theme: {
-    extend: {},
+    extend: {
+      aria: {
+        current_page: 'current="page"',
+      },
+    },
   },
   plugins: [],
 }

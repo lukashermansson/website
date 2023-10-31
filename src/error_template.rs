@@ -54,19 +54,21 @@ pub fn ErrorTemplate(
     }}
 
     view! {
-        <h1>An error has occured</h1>
-        <For
-            // a function that returns the items we're iterating over; a signal is fine
-            each= move || {errors.clone().into_iter().enumerate()}
-            // a unique key for each item as a reference
-            key=|(index, _error)| *index
-            // renders each item to a view
-            children=move |error| {
-                let error_string = error.1.to_string();
-                view! {
-                    <p>{error_string}</p>
+        <div class="m-auto w-4/5 flex text-center flex-col text-gray-400">
+            <h1 class="text-4xl font-bold my-4">An error has occured</h1>
+            <For
+                // a function that returns the items we're iterating over; a signal is fine
+                each= move || {errors.clone().into_iter().enumerate()}
+                // a unique key for each item as a reference
+                key=|(index, _error)| *index
+                // renders each item to a view
+                children=move |error| {
+                    let error_string = error.1.to_string();
+                    view! {
+                        <p>{error_string}</p>
+                    }
                 }
-            }
-        />
+            />
+        </div>
     }
 }

@@ -27,14 +27,14 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
 }
 
 #[server()]
-pub async fn get_project(name: String) -> Result<String, ServerFnError> {
+pub async fn get_project(name: String) -> Result<(String, String), ServerFnError> {
     let file = std::fs::read_to_string(format!("./projects/{}.mdx", name)).map_err(|_| {
             ServerFnError::ServerError("Not found".into())
         })?;
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
     let result = matter.parse(&file);
-    return Ok(markdown::to_html(&result.content))
+    return Ok((result.data.unwrap()["title"].as_string().unwrap(), markdown::to_html(&result.content)))
 }
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Project {
@@ -55,12 +55,12 @@ pub fn Projects() -> impl IntoView {
            {move || match once.get() {
                None => view! { <p>"Loading..."</p> }.into_view(),
                Some(data) => view! {
-                   <div class="flex place-content-around mt-2 gap-4 flex-wrap">
+                   <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
                        {data.unwrap().into_iter()
                        .map(|n| view! {
-                           <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950 w-full md:w-5/12">
+                           <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950">
                            <A href={n.url}>
-                               <h2>{&n.name} <span class="italic opacity-75 font-light">{&n.date.to_string()}</span></h2>
+                               <h2 class="text-2xl font-bold">{&n.name} <span class="italic opacity-75 font-light ml-1">{&n.date.to_string()}</span></h2>
                                <p>{&n.description}</p>
                                <div>
                                 {n.tags.into_iter()
@@ -106,7 +106,10 @@ pub fn Project() -> impl IntoView {
                    {
                        match data {
                        Err(_) => Err::<(), AppError>(AppError::NotFound).into_view(),
-                       Ok(data) => view! { <div inner_html=data/> }.into_view()
+                       Ok((title, data)) => view! {
+                           <h1 class="text-4xl my-3 font-bold">{title}</h1>
+                           <div class="post" inner_html=data/>
+                       }.into_view()
                    }
                    }
                    </ErrorBoundary>

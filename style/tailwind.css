@@ -1,7 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer components {
+    body {
+        @apply bg-gray-900
+    }
 
-body {
-    @apply bg-gray-900
+    .post h1 {
+        @apply text-4xl font-bold my-2
+    }
+    .post h2 {
+        @apply text-3xl font-bold my-2
+    }
+    .post h3 {
+        @apply text-2xl font-bold my-2
+    }
+    .post h4 {
+        @apply text-3xl font-bold my-2
+    }
+    .post b {
+        @apply font-bold
+    }
+    .post p {
+        @apply my-2
+    }
+    .post a {
+        @apply underline
+    }
 }
