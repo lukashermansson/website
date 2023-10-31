@@ -25,9 +25,7 @@ jobs:
         override: true
     - name: Set up bininstall
       run:
-        wget https://github.com/cargo-bins/cargo-binstall/releases/latest/download/cargo-binstall-x86_64-unknown-linux-musl.tgz
-        tar -xvf cargo-binstall-x86_64-unknown-linux-musl.tgz
-        cp cargo-binstall /usr/local/cargo/bin
+        curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
         cargo binstall cargo-leptos -y
         rustup target add wasm32-unknown-unknown
     - name: Build
