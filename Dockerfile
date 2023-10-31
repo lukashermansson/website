@@ -1,7 +1,7 @@
 # Production image, copy all the files and run next
 FROM debian
 
-COPY target/release/leptos-start ./
+COPY target/server/release/website-2 ./
 COPY target/site ./site
 
 ENV RUST_LOG="info"
@@ -12,4 +12,4 @@ EXPOSE 3000
 
 ENV PORT 3000
 
-CMD ["/leptos_start"]
+CMD ["/website-2"]
