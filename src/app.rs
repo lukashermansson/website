@@ -47,7 +47,7 @@ fn HomePage() -> impl IntoView {
     view! {
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
             <h2 class="font-bold text-3xl text-center m-6">My code-values</h2>
-            <div>
+            <div class="text-center">
                 <p class="m-2">I value code-quality, code that is easy to maintain with good separation and structure, stuff that facilitates longlived code-bases that are easy to change.</p>
                 <p class="m-2">I value unit tests on the code I work with, partly because of the testing and the tests that are produced but also because of the higher code quality produced that arise from test driven development.</p>
                 <p class="m-2">I am passionate about code that is self-documenting on a micro and a marco perspective, from tests, carefully chosen symbols and a clear structure.</p>
