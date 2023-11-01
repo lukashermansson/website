@@ -1,7 +1,7 @@
 # Production image, copy all the files and run next
 FROM debian
 
-COPY target/armv7-unknown-linux-gnueabi/release/website-2 ./
+COPY target/aarch64-unknown-linux-gnu/release/website-2 ./
 COPY target/site ./site
 
 ENV RUST_LOG="info"
