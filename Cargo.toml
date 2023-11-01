@@ -28,6 +28,7 @@ serde = "1.0.190"
 chrono = { version = "0.4.31", features = ["serde"]}
 gray_matter = { version = "0.2.6", optional = true}
 markdown = { version = "1.0.0-alpha.14", optional = true }
+
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
@@ -52,11 +53,8 @@ lto = true
 codegen-units = 1
 panic = "abort"
 
-[target.aarch64-unknown-linux-gnu]
-linker = "/usr/bin/aarch64-linux-gnu-gcc"
 
-[target.armv7-unknown-linux-gnueabi]
-linker = "arm-linux-gnueabi-gcc"
+
 
 [package.metadata.leptos]
 # The name used by wasm-bindgen/cargo-leptos for the JS/WASM bundle. Defaults to the crate name
