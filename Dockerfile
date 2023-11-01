@@ -3,6 +3,8 @@ FROM debian
 
 COPY target/aarch64-unknown-linux-gnu/release/website-2 ./
 COPY target/site ./site
+COPY public ./public
+COPY projects ./projects
 
 ENV RUST_LOG="info"
 ENV APP_ENVIRONMENT="production"
