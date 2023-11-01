@@ -28,12 +28,11 @@ jobs:
         curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
         cargo binstall cargo-leptos -y
         rustup target add wasm32-unknown-unknown
-        rustup target add armv7-unknown-linux-gnueabihf
-        sudo apt install gcc-arm-linux-gnueabihf
+        rustup target add aarch64-unknown-linux-musl
     - name: Build
       run: cargo leptos build --release -vv
       env:
-        LEPTOS_BIN_TARGET_TRIPLE: armv7-unknown-linux-gnueabihf
+        LEPTOS_BIN_TARGET_TRIPLE: aarch64-unknown-linux-musl
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
