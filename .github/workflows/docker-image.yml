@@ -28,8 +28,8 @@ jobs:
         curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
         cargo binstall cargo-leptos -y
         rustup target add wasm32-unknown-unknown
-        sudo apt install -y gcc-aarch64-linux-gnu
-        rustup target add aarch64-unknown-linux-gnu
+        sudo apt install -y gcc-arm-linux-gnueabi
+        rustup target add armv7-unknown-linux-gnueabi
     - name: Build
       run: cargo leptos build --release -vv
       env:
