@@ -49,35 +49,54 @@ pub fn Projects() -> impl IntoView {
     let once = create_resource(|| (), |_| async move { get_projects().await });
     view! {
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
-           <Suspense
-               fallback=move || view! { <p>"Loading..."</p> }
-           >
-           {move || match once.get() {
-               None => view! { <p>"Loading..."</p> }.into_view(),
-               Some(data) => view! {
-                   <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
-                       {data.unwrap().into_iter()
-                       .map(|n| view! {
-                           <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950">
-                           <A href={n.url}>
-                               <h2 class="text-2xl font-bold">{&n.name} <span class="italic opacity-75 font-light ml-1">{&n.date.to_string()}</span></h2>
-                               <p>{&n.description}</p>
-                               <div>
-                                {n.tags.into_iter()
-                                    .map(|n| view! {
-                                        <p class="inline-block bg-slate-900 rounded m-1 p-1 ">{n}</p>
+            <Suspense fallback=move || {
+                view! { <p>"Loading..."</p> }
+            }>
+                {move || match once.get() {
+                    None => view! { <p>"Loading..."</p> }.into_view(),
+                    Some(data) => {
+                        view! {
+                            <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
+                                {data
+                                    .unwrap()
+                                    .into_iter()
+                                    .map(|n| {
+                                        view! {
+                                            <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950">
+                                                <A href=n.url>
+                                                    <h2 class="text-2xl font-bold">
+                                                        {&n.name}
+                                                        <span class="italic opacity-75 font-light ml-1">
+                                                            {&n.date.to_string()}
+                                                        </span>
+                                                    </h2>
+                                                    <p>{&n.description}</p>
+                                                    <div>
+                                                        {n
+                                                            .tags
+                                                            .into_iter()
+                                                            .map(|n| {
+                                                                view! {
+                                                                    <p class="inline-block bg-slate-900 rounded m-1 p-1 ">
+                                                                        {n}
+                                                                    </p>
+                                                                }
+                                                            })
+                                                            .collect::<Vec<_>>()}
+                                                    </div>
+                                                </A>
+                                            </div>
+                                        }
                                     })
-                               .collect::<Vec<_>>()}
-                                </div>
-                           </A>
-                           </div>})
-                       .collect::<Vec<_>>()
-                       }
-                   </div>
-               }.into_view()
-               }
-           }
-           </Suspense>
+                                    .collect::<Vec<_>>()}
+
+                            </div>
+                        }
+                            .into_view()
+                    }
+                }}
+
+            </Suspense>
         </div>
     }
 }
@@ -91,31 +110,36 @@ pub fn Project() -> impl IntoView {
 
     view! {
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
-           <Suspense
-               fallback=move || view! { <p>"Loading..."</p> }
-           >
-           {move || match once.get() {
-               None => view! { <p>"Loading..."</p> }.into_view(),
-               Some(data) => view! {
-        <ErrorBoundary
-                // the fallback receives a signal containing current errors
-                fallback=|errors| view! {
-                   <ErrorTemplate errors/>
-                }
-            >
-                   {
-                       match data {
-                       Err(_) => Err::<(), AppError>(AppError::NotFound).into_view(),
-                       Ok((title, data)) => view! {
-                           <h1 class="text-4xl my-3 font-bold">{title}</h1>
-                           <div class="post" inner_html=data/>
-                       }.into_view()
-                   }
-                   }
-                   </ErrorBoundary>
-               }.into_view()}
-           }
-           </Suspense>
+            <Suspense fallback=move || {
+                view! { <p>"Loading..."</p> }
+            }>
+                {move || match once.get() {
+                    None => view! { <p>"Loading..."</p> }.into_view(),
+                    Some(data) => {
+                        view! {
+                            <ErrorBoundary // the fallback receives a signal containing current errors
+                            fallback=|errors| {
+                                view! { <ErrorTemplate errors/> }
+                            }>
+
+                                {match data {
+                                    Err(_) => Err::<(), AppError>(AppError::NotFound).into_view(),
+                                    Ok((title, data)) => {
+                                        view! {
+                                            <h1 class="text-4xl my-3 font-bold">{title}</h1>
+                                            <div class="post" inner_html=data></div>
+                                        }
+                                            .into_view()
+                                    }
+                                }}
+
+                            </ErrorBoundary>
+                        }
+                            .into_view()
+                    }
+                }}
+
+            </Suspense>
         </div>
     }
 }
