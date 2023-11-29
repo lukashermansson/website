@@ -6,7 +6,7 @@ pub fn Navbar() -> impl IntoView {
     view! {
         <nav class="flex align-center bg-slate-700">
             <A href="/" class="m-1">
-                <img src="/assets/logo.jpg" class="rounded-full" alt="Logo" height="64" width="64"/>
+                <img src="/assets/logo.webp" class="rounded-full" alt="Logo" height="64" width="64"/>
             </A>
             <div class="flex justify-end grow">
                 <A

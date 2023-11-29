@@ -1,10 +1,10 @@
+use crate::error_template::AppError;
+use crate::error_template::ErrorTemplate;
 use crate::navbar::Navbar;
-use crate::projects::Projects;
 use crate::projects::Project;
+use crate::projects::Projects;
 use leptos::*;
 use leptos_meta::*;
-use crate::error_template::ErrorTemplate;
-use crate::error_template::AppError;
 use leptos_router::*;
 
 #[component]
@@ -14,7 +14,8 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Stylesheet id="leptos" href="/pkg/website-2.css"/>
-
+        <Html lang="en"/>
+        <Meta name="description" content="Lukas Hermansson's personal website"/>
         // sets the document title
         <Title text="Lukas Hermansson"/>
 
@@ -74,7 +75,7 @@ fn HomePage() -> impl IntoView {
 fn ProgrammingLang(language_name: &'static str, url: &'static str) -> impl IntoView {
     view! {
         <div class="p-3 flex flex-col items-center rounded shadow-md shadow-gray-950 bg-slate-800 min-w-[190px]">
-            <img src=url class="h-12"/>
+            <img alt=language_name src=url class="h-12"/>
             <p>{language_name}</p>
         </div>
     }
@@ -120,3 +121,4 @@ fn Footer() -> impl IntoView {
         </footer>
     }
 }
+
