@@ -1,8 +1,8 @@
-use tower_http::services::{ServeDir, ServeFile};
 
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
+    use tower_http::services::{ServeDir, ServeFile};
     use axum::{routing::post, Router};
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};

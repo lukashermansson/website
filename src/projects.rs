@@ -1,6 +1,5 @@
-use chrono::{NaiveDate};
+use chrono::NaiveDate;
 use leptos::*;
-use leptos_meta::Meta;
 use serde::{Deserialize, Serialize};
 use leptos::Suspense;
 use leptos_router::{A, use_params_map};
@@ -118,8 +117,8 @@ pub fn Project() -> impl IntoView {
                     None => view! { <p>"Loading..."</p> }.into_view(),
                     Some(data) => {
                         view! {
-                            <ErrorBoundary // the fallback receives a signal containing current errors
-                            fallback=|errors| {
+                            // the fallback receives a signal containing current errors
+                            <ErrorBoundary fallback=|errors| {
                                 view! { <ErrorTemplate errors/> }
                             }>
 
@@ -144,3 +143,4 @@ pub fn Project() -> impl IntoView {
         </div>
     }
 }
+
