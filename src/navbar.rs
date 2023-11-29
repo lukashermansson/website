@@ -11,13 +11,13 @@ pub fn Navbar() -> impl IntoView {
             <div class="flex justify-end grow">
                 <A
                     href="/"
-                    class="flex items-center text-gray-400 hover:text-gray-300 m-4 font-bold aria-current_page:text-gray-300"
+                    class="flex items-center text-gray-300 hover:text-gray-300 m-4 font-bold aria-current_page:text-gray-100"
                 >
                     Home
                 </A>
                 <A
                     href="/projects"
-                    class="flex items-center text-gray-400 hover:text-gray-300 m-4 font-bold aria-current_page:text-gray-300"
+                    class="flex items-center text-gray-300 hover:text-gray-300 m-4 font-bold aria-current_page:text-gray-100"
                 >
                     Projects
                 </A>
