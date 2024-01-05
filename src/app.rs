@@ -41,6 +41,11 @@ pub fn App() -> impl IntoView {
 #[component]
 fn HomePage() -> impl IntoView {
     view! {
+        <Meta property="og:title" content="Lukas Hermansson" />
+        <Meta property="og:description" content="Lukas Hermansson's personal website" />
+        <Meta property="og:type" content="website" />
+        <Meta property="og:image" content="https://www.lukashermansson.me/assets/og-card.jpg" />
+        <Title text="Lukas Hermansson"/>
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
             <h2 class="font-bold text-3xl text-center m-6">My code-values</h2>
             <div class="text-center">

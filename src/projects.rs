@@ -44,9 +44,10 @@ pub struct Project {
     description: String,
     tags: Vec<String>,
 }
+use leptos_meta::Meta;
 #[component]
 pub fn Projects() -> impl IntoView {
-    let once = create_resource(|| (), |_| async move { get_projects().await });
+    let once = create_blocking_resource(|| (), |_| async move { get_projects().await });
     view! {
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
             <Suspense fallback=move || {
@@ -56,6 +57,17 @@ pub fn Projects() -> impl IntoView {
                     None => view! { <p>"Loading..."</p> }.into_view(),
                     Some(data) => {
                         view! {
+                            <Title text="Lukas Hermansson"/>
+                            <Meta property="og:title" content="Projects"/>
+                            <Meta
+                                property="og:description"
+                                content="Lukas Hermansson's projects listing"
+                            />
+                            <Meta
+                                property="og:image"
+                                content="https://www.lukashermansson.me/assets/og-card.jpg"
+                            />
+                            <Meta property="og:type" content="website"/>
                             <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
                                 {data
                                     .unwrap()
@@ -100,13 +112,14 @@ pub fn Projects() -> impl IntoView {
         </div>
     }
 }
+use leptos_meta::Title;
 #[component]
 pub fn Project() -> impl IntoView {
     let params = use_params_map();
     let id = move || {
         params.with(|params| params.get("id").cloned()).unwrap()
     };
-    let once = create_resource(id, |arg| async move { get_project(arg).await });
+    let once = create_blocking_resource(id, |arg| async move { get_project(arg).await });
 
     view! {
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
@@ -126,6 +139,17 @@ pub fn Project() -> impl IntoView {
                                     Err(_) => Err::<(), AppError>(AppError::NotFound).into_view(),
                                     Ok((title, data)) => {
                                         view! {
+                                            <Meta property="og:title" content=format!("{}", &title)/>
+                                            <Meta
+                                                property="og:description"
+                                                content=format!("project: {}", &title)
+                                            />
+                                            <Meta property="og:type" content="website"/>
+                                            <Meta
+                                                property="og:image"
+                                                content="https://www.lukashermansson.me/assets/og-card.jpg"
+                                            />
+                                            <Title text=format!("Lukas Hermansson - {}", &title)/>
                                             <h1 class="text-4xl my-3 font-bold">{title}</h1>
                                             <div class="post" inner_html=data></div>
                                         }
@@ -143,4 +167,8 @@ pub fn Project() -> impl IntoView {
         </div>
     }
 }
+
+
+
+
 
