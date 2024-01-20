@@ -1,15 +1,24 @@
-
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
-    use tower_http::services::{ServeDir, ServeFile};
     use axum::{routing::post, Router};
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
-    use website_2::app::*;
-    use website_2::fileserv::file_and_error_handler;
-
-    simple_logger::init_with_level(log::Level::Info).expect("couldn't initialize logging");
+    use tower_http::services::{ServeDir, ServeFile};
+    use tower_http::{trace::TraceLayer};
+    use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+    use website::app::*;
+    use website::fileserv::file_and_error_handler;
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+                // axum logs rejections from built-in extractors with the `axum::rejection`
+                // target, at `TRACE` level. `axum::rejection=trace` enables showing those events
+                "website=debug,tower_http=debug,axum::rejection=trace".into()
+            }),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
     // Setting get_configuration(None) means we'll be using cargo-leptos's env values
     // For deployment these variables are:
@@ -28,7 +37,8 @@ async fn main() {
         .nest_service("/favicon.ico", ServeFile::new("public/favicon.ico"))
         .leptos_routes(&leptos_options, routes, App)
         .fallback(file_and_error_handler)
-        .with_state(leptos_options);
+        .with_state(leptos_options)
+        .layer(TraceLayer::new_for_http());
 
     // run our app with hyper
     // `axum::Server` is a re-export of `hyper::Server`

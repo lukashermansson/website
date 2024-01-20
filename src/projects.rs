@@ -1,40 +1,63 @@
-use chrono::NaiveDate;
-use leptos::*;
-use serde::{Deserialize, Serialize};
-use leptos::Suspense;
-use leptos_router::{A, use_params_map};
-use crate::error_template::ErrorTemplate;
 use crate::error_template::AppError;
+use crate::error_template::ErrorTemplate;
+use chrono::NaiveDate;
+use leptos::Suspense;
+use leptos::*;
+use leptos_router::{use_params_map, A};
+use serde::{Deserialize, Serialize};
 
 #[server()]
 pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
     let paths = std::fs::read_dir("./projects").unwrap();
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
-    return Ok(paths.into_iter().map(|p| {
-        let f_entry = p.unwrap();
-        let content = std::fs::read_to_string(f_entry.path()).unwrap();
-        let result = matter.parse(&content);
-        let data = result.data.unwrap();
-        Project {
-            url: format!("/projects/{}", f_entry.file_name().into_string().unwrap().strip_suffix(".mdx").unwrap()).to_string(),
-            name: data["title"].as_string().unwrap(),
-            date: NaiveDate::parse_from_str(data["date"].as_string().unwrap().as_str(), "%Y-%m-%d").unwrap(),
-            description: data["description"].as_string().unwrap(),
-            tags: data["tech"].as_vec().unwrap().iter().map(|p| p.as_string().unwrap()).collect::<Vec<_>>(),
-        }
-    }).collect::<Vec<_>>());
+    return Ok(paths
+        .into_iter()
+        .map(|p| {
+            let f_entry = p.unwrap();
+            let content = std::fs::read_to_string(f_entry.path()).unwrap();
+            let result = matter.parse(&content);
+            let data = result.data.unwrap();
+            Project {
+                url: format!(
+                    "/projects/{}",
+                    f_entry
+                        .file_name()
+                        .into_string()
+                        .unwrap()
+                        .strip_suffix(".mdx")
+                        .unwrap()
+                )
+                .to_string(),
+                name: data["title"].as_string().unwrap(),
+                date: NaiveDate::parse_from_str(
+                    data["date"].as_string().unwrap().as_str(),
+                    "%Y-%m-%d",
+                )
+                .unwrap(),
+                description: data["description"].as_string().unwrap(),
+                tags: data["tech"]
+                    .as_vec()
+                    .unwrap()
+                    .iter()
+                    .map(|p| p.as_string().unwrap())
+                    .collect::<Vec<_>>(),
+            }
+        })
+        .collect::<Vec<_>>());
 }
 
 #[server()]
 pub async fn get_project(name: String) -> Result<(String, String), ServerFnError> {
-    let file = std::fs::read_to_string(format!("./projects/{}.mdx", name)).map_err(|_| {
-            ServerFnError::ServerError("Not found".into())
-        })?;
+    let file = std::fs::read_to_string(format!("./projects/{}.mdx", name))
+        .map_err(|_| ServerFnError::ServerError("Not found".into()))?;
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
     let result = matter.parse(&file);
-    return Ok((result.data.unwrap()["title"].as_string().unwrap(), markdown::to_html(&result.content)))
+    return Ok((
+        result.data.unwrap()["title"].as_string().unwrap(),
+        markdown::to_html(&result.content),
+    ));
 }
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Project {
@@ -116,9 +139,7 @@ use leptos_meta::Title;
 #[component]
 pub fn Project() -> impl IntoView {
     let params = use_params_map();
-    let id = move || {
-        params.with(|params| params.get("id").cloned()).unwrap()
-    };
+    let id = move || params.with(|params| params.get("id").cloned()).unwrap();
     let once = create_blocking_resource(id, |arg| async move { get_project(arg).await });
 
     view! {
@@ -167,8 +188,3 @@ pub fn Project() -> impl IntoView {
         </div>
     }
 }
-
-
-
-
-
