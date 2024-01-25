@@ -6,7 +6,6 @@ COPY target/site ./site
 COPY public ./public
 COPY projects ./projects
 
-ENV RUST_LOG="info"
 ENV APP_ENVIRONMENT="production"
 ENV LEPTOS_SITE_ADDR="0.0.0.0:3000"
 ENV LEPTOS_SITE_ROOT="site"
