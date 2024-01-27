@@ -50,7 +50,7 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
 #[server()]
 pub async fn get_project(name: String) -> Result<(String, String), ServerFnError> {
     let file = std::fs::read_to_string(format!("./projects/{}.mdx", name))
-        .map_err(|_| ServerFnError::ServerError("Not found".into()))?;
+        .map_err(|_| ServerFnError::new("Not found"))?;
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
     let result = matter.parse(&file);

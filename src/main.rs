@@ -1,14 +1,16 @@
 #[cfg(feature = "ssr")]
 #[tokio::main]
 async fn main() {
-    use axum::{routing::post, Router};
+    use axum::Router;
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
-    use tower_http::services::{ServeDir, ServeFile};
-    use tower_http::{trace::TraceLayer};
     use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
     use website::app::*;
     use website::fileserv::file_and_error_handler;
+    use tower_http::trace::TraceLayer;
+    use tower_http::services::ServeFile;
+    use tower_http::services::ServeDir;
+
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
@@ -19,7 +21,6 @@ async fn main() {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-
     // Setting get_configuration(None) means we'll be using cargo-leptos's env values
     // For deployment these variables are:
     // <https://github.com/leptos-rs/start-axum#executing-a-server-on-a-remote-machine-without-the-toolchain>
@@ -32,7 +33,6 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .nest_service("/assets", ServeDir::new("public"))
         .nest_service("/favicon.ico", ServeFile::new("public/favicon.ico"))
         .leptos_routes(&leptos_options, routes, App)
@@ -40,11 +40,9 @@ async fn main() {
         .with_state(leptos_options)
         .layer(TraceLayer::new_for_http());
 
-    // run our app with hyper
-    // `axum::Server` is a re-export of `hyper::Server`
-    log::info!("listening on http://{}", &addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    logging::log!("listening on http://{}", &addr);
+    axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
 }
