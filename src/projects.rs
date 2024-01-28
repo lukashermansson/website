@@ -5,17 +5,18 @@ use leptos::Suspense;
 use leptos::*;
 use leptos_router::{use_params_map, A};
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[server()]
 pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
     let paths = std::fs::read_dir("./projects").unwrap();
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
-    return Ok(paths
+    return Ok(futures::future::join_all(paths
         .into_iter()
-        .map(|p| {
+        .map(|p| async {
             let f_entry = p.unwrap();
-            let content = std::fs::read_to_string(f_entry.path()).unwrap();
+            let content = tokio::fs::read_to_string(f_entry.path()).await.unwrap();
             let result = matter.parse(&content);
             let data = result.data.unwrap();
             Project {
@@ -44,12 +45,15 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
                     .collect::<Vec<_>>(),
             }
         })
-        .collect::<Vec<_>>());
+        .collect::<Vec<_>>()).await);
 }
 
 #[server()]
 pub async fn get_project(name: String) -> Result<(String, String), ServerFnError> {
-    let file = std::fs::read_to_string(format!("./projects/{}.mdx", name))
+    let mut path = PathBuf::from("./projects/file");
+    path.set_file_name(name);
+    path.set_extension("mdx");
+    let file =  tokio::fs::read_to_string(path).await
         .map_err(|_| ServerFnError::new("Not found"))?;
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
@@ -70,28 +74,22 @@ pub struct Project {
 use leptos_meta::Meta;
 #[component]
 pub fn Projects() -> impl IntoView {
-    let once = create_blocking_resource(|| (), |_| async move { get_projects().await });
+    let once = create_resource(|| (), |_| async move { get_projects().await });
     view! {
+        <Title text="Lukas Hermansson"/>
+        <Meta property="og:title" content="Projects"/>
+        <Meta property="og:description" content="Lukas Hermansson's projects listing"/>
+        <Meta property="og:image" content="https://www.lukashermansson.me/assets/og-card.jpg"/>
+        <Meta property="og:type" content="website"/>
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
-            <Suspense fallback=move || {
-                view! { <p>"Loading..."</p> }
-            }>
-                {move || match once.get() {
-                    None => view! { <p>"Loading..."</p> }.into_view(),
-                    Some(data) => {
-                        view! {
-                            <Title text="Lukas Hermansson"/>
-                            <Meta property="og:title" content="Projects"/>
-                            <Meta
-                                property="og:description"
-                                content="Lukas Hermansson's projects listing"
-                            />
-                            <Meta
-                                property="og:image"
-                                content="https://www.lukashermansson.me/assets/og-card.jpg"
-                            />
-                            <Meta property="og:type" content="website"/>
-                            <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
+            <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
+                <Suspense fallback=move || {
+                    view! { <ProjectsPlaceholder/> }
+                }>
+                    {move || match once.get() {
+                        None => view! { <ProjectsPlaceholder/> },
+                        Some(data) => {
+                            view! {
                                 {data
                                     .unwrap()
                                     .into_iter()
@@ -124,30 +122,91 @@ pub fn Projects() -> impl IntoView {
                                         }
                                     })
                                     .collect::<Vec<_>>()}
-
-                            </div>
+                            }
+                                .into_view()
                         }
-                            .into_view()
-                    }
-                }}
+                    }}
 
-            </Suspense>
+                </Suspense>
+            </div>
         </div>
     }
+}
+#[component]
+fn projects_placeholder() -> impl IntoView {
+        (0..6)
+                                    .map(|_| {
+                                        view! {
+                                            <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950 animate-pulse">
+                                                <div class="flex flex-row mb-2">
+                                                    <div class="h-5 w-40 bg-gray-400 rounded"></div>
+                                                    <div class="opacity-75 ml-1 h-5 w-32 bg-gray-400 rounded"></div>
+                                                </div>
+                                                <div class="h-3 max-w-30 bg-gray-400 rounded mb-2"></div>
+                                                <div>
+                                                    {(0..3)
+                                                        .map(|_| {
+                                                            view! {
+                                                                <div class="inline-block bg-slate-900 rounded m-1 p-1 h-5 w-10"></div>
+                                                            }
+                                                        })
+                                                        .collect::<Vec<_>>()}
+                                                </div>
+                                            </div>
+                                        }
+                                    })
+                                    .collect::<Vec<_>>()
 }
 use leptos_meta::Title;
 #[component]
 pub fn Project() -> impl IntoView {
     let params = use_params_map();
     let id = move || params.with(|params| params.get("id").cloned()).unwrap();
-    let once = create_blocking_resource(id, |arg| async move { get_project(arg).await });
+    let resource = create_blocking_resource(id, |arg| async move { get_project(arg).await });
 
     view! {
         <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
             <Suspense fallback=move || {
-                view! { <p>"Loading..."</p> }
+                view! {
+                    <div class="animate-pulse ">
+                        <div class="h-7 my-6 bg-gray-400 w-64 rounded"></div>
+                        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
+                            <div class="flex items-center w-full">
+                                <div class="h-2.5 bg-gray-200 rounded-full bg-gray-700 w-32"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                            </div>
+                            <div class="flex items-center w-full max-w-[480px]">
+                                <div class="h-2.5 bg-gray-200 rounded-full bg-gray-700 w-full"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
+                            </div>
+                            <div class="flex items-center w-full max-w-[400px]">
+                                <div class="h-2.5 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-80"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                            </div>
+                            <div class="flex items-center w-full max-w-[480px]">
+                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-full"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
+                            </div>
+                            <div class="flex items-center w-full max-w-[440px]">
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-32"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
+                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-full"></div>
+                            </div>
+                            <div class="flex items-center w-full max-w-[360px]">
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-80"></div>
+                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
+                            </div>
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                }
             }>
-                {move || match once.get() {
+                {move || match resource.get() {
                     None => view! { <p>"Loading..."</p> }.into_view(),
                     Some(data) => {
                         view! {
@@ -188,3 +247,10 @@ pub fn Project() -> impl IntoView {
         </div>
     }
 }
+
+
+
+
+
+
+
