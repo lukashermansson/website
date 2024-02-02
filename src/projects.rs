@@ -12,7 +12,7 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
     let paths = std::fs::read_dir("./projects").unwrap();
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
-    return Ok(futures::future::join_all(paths
+    let mut projects = futures::future::join_all(paths
         .into_iter()
         .map(|p| async {
             let f_entry = p.unwrap();
@@ -45,7 +45,9 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
                     .collect::<Vec<_>>(),
             }
         })
-        .collect::<Vec<_>>()).await);
+        .collect::<Vec<_>>()).await;
+    projects.sort_by(|a, b| b.date.cmp(&a.date));
+    return Ok(projects);
 }
 
 #[server()]

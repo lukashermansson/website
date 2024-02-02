@@ -1,0 +1,19 @@
+---
+title: Website (Current)
+year: 2023
+date: '2023-11-09'
+description: Information about the current website
+tech: ['Leptos', 'docker', 'Rust', ]
+---
+## Purpose
+I wanted to have a more enjoyable technology for when I wanted to touch the website for content updates.
+Compared to the old website that was written in **Next.js**
+## Technology
+I wanted to work with **Rust** and chose a UI framework that I was invested in called [Leptos](https://leptos.dev/),
+The codebase can be seen at my [github repo](https://github.com/lukashermansson/website) 
+
+It is server side rendered and served running on top of Axum, that is the web-server framework I am most familiar with in the Rust ecosystem.
+The style is all set up using tailwind classes, and they work pretty nicely in combination with `Leptos`.
+
+### Artifact
+The build pipeline generates a docker container, cross compield for the target achitecture (arm64) that is then deployed on my kubernetes cluster
