@@ -46,7 +46,7 @@ fn HomePage() -> impl IntoView {
         <Meta property="og:type" content="website" />
         <Meta property="og:image" content="https://www.lukashermansson.me/assets/og-card.jpg" />
         <Title text="Lukas Hermansson"/>
-        <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
+        <div class="m-auto md:w-3/5 w-100 flex flex-col text-gray-400 ">
             <h2 class="font-bold text-3xl text-center m-6">My code-values</h2>
             <div class="text-center">
                 <p class="m-2">

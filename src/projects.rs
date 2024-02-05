@@ -83,8 +83,8 @@ pub fn Projects() -> impl IntoView {
         <Meta property="og:description" content="Lukas Hermansson's projects listing"/>
         <Meta property="og:image" content="https://www.lukashermansson.me/assets/og-card.jpg"/>
         <Meta property="og:type" content="website"/>
-        <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
-            <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 md:grid-cols-2">
+        <div class="m-auto md:w-3/5 w-100 max-md:m-2  flex flex-col text-gray-400 ">
+            <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 lg:grid-cols-2">
                 <Suspense fallback=move || {
                     view! { <ProjectsPlaceholder/> }
                 }>
@@ -101,7 +101,7 @@ pub fn Projects() -> impl IntoView {
                                                 <A href=n.url>
                                                     <h2 class="text-2xl font-bold">
                                                         {&n.name}
-                                                        <span class="italic opacity-75 font-light ml-1">
+                                                        <span class="italic block float-right opacity-75 font-light ml-1">
                                                             {&n.date.to_string()}
                                                         </span>
                                                     </h2>
@@ -112,7 +112,7 @@ pub fn Projects() -> impl IntoView {
                                                             .into_iter()
                                                             .map(|n| {
                                                                 view! {
-                                                                    <p class="inline-block bg-slate-900 rounded m-1 p-1 ">
+                                                                    <p class="inline-block bg-slate-900 rounded m-1 p-1">
                                                                         {n}
                                                                     </p>
                                                                 }
@@ -167,7 +167,7 @@ pub fn Project() -> impl IntoView {
     let resource = create_blocking_resource(id, |arg| async move { get_project(arg).await });
 
     view! {
-        <div class="m-auto w-4/5 flex flex-col text-gray-400 ">
+        <div class="m-auto md:w-3/5 w-100 max-md:m-2 flex flex-col text-gray-400 ">
             <Suspense fallback=move || {
                 view! {
                     <div class="animate-pulse ">
