@@ -1,11 +1,9 @@
 use crate::error_template::AppError;
 use crate::error_template::ErrorTemplate;
 use chrono::NaiveDate;
-use leptos::Suspense;
 use leptos::*;
 use leptos_router::{use_params_map, A};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 #[server()]
 pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {

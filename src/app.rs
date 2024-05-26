@@ -11,6 +11,7 @@ use leptos_router::*;
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+    let (is_routing, set_is_routing) = create_signal(false);
 
     view! {
         <Stylesheet id="leptos" href="/pkg/website-2.css"/>
@@ -23,7 +24,10 @@ pub fn App() -> impl IntoView {
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
             view! { <ErrorTemplate outside_errors/> }.into_view()
-        }>
+        } set_is_routing>
+            <div class="routing-progress">
+                <RoutingProgress is_routing max_time=std::time::Duration::from_millis(250)/>
+            </div>
             <Navbar/>
             <main>
                 <Routes>

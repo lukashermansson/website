@@ -27,4 +27,12 @@
     .post a {
         @apply underline
     }
+
+
+.routing-progress, .routing-progress progress {
+    position: absolute;
+	height: 3px;
+    background-color: transparent;
+	width: 100%;
+}
 }

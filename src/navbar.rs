@@ -4,7 +4,7 @@ use leptos_router::A;
 #[component]
 pub fn Navbar() -> impl IntoView {
     view! {
-        <nav class="flex align-center bg-slate-700">
+        <nav class="flex align-center top-0 left-0 w-100 bg-slate-700">
             <A href="/" class="m-1">
                 <img src="/assets/logo.webp" class="rounded-full" alt="Logo" height="64" width="64"/>
             </A>
