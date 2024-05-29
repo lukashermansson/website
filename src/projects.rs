@@ -4,64 +4,68 @@ use chrono::NaiveDate;
 use leptos::*;
 use leptos_router::{use_params_map, A};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 #[server()]
 pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
     let paths = std::fs::read_dir("./projects").unwrap();
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
-    let mut projects = futures::future::join_all(paths
-        .into_iter()
-        .map(|p| async {
-            let f_entry = p.unwrap();
-            let content = tokio::fs::read_to_string(f_entry.path()).await.unwrap();
-            let result = matter.parse(&content);
-            let data = result.data.unwrap();
-            Project {
-                url: format!(
-                    "/projects/{}",
-                    f_entry
-                        .file_name()
-                        .into_string()
+    let mut projects = futures::future::join_all(
+        paths
+            .into_iter()
+            .map(|p| async {
+                let f_entry = p.unwrap();
+                let content = tokio::fs::read_to_string(f_entry.path()).await.unwrap();
+                let result = matter.parse(&content);
+                let data = result.data.unwrap();
+                Project {
+                    url: format!(
+                        "/projects/{}",
+                        f_entry
+                            .file_name()
+                            .into_string()
+                            .unwrap()
+                            .strip_suffix(".mdx")
+                            .unwrap()
+                    )
+                    .to_string(),
+                    name: data["title"].as_string().unwrap(),
+                    date: NaiveDate::parse_from_str(
+                        data["date"].as_string().unwrap().as_str(),
+                        "%Y-%m-%d",
+                    )
+                    .unwrap(),
+                    description: data["description"].as_string().unwrap(),
+                    tags: data["tech"]
+                        .as_vec()
                         .unwrap()
-                        .strip_suffix(".mdx")
-                        .unwrap()
-                )
-                .to_string(),
-                name: data["title"].as_string().unwrap(),
-                date: NaiveDate::parse_from_str(
-                    data["date"].as_string().unwrap().as_str(),
-                    "%Y-%m-%d",
-                )
-                .unwrap(),
-                description: data["description"].as_string().unwrap(),
-                tags: data["tech"]
-                    .as_vec()
-                    .unwrap()
-                    .iter()
-                    .map(|p| p.as_string().unwrap())
-                    .collect::<Vec<_>>(),
-            }
-        })
-        .collect::<Vec<_>>()).await;
+                        .iter()
+                        .map(|p| p.as_string().unwrap())
+                        .collect::<Vec<_>>(),
+                }
+            })
+            .collect::<Vec<_>>(),
+    )
+    .await;
     projects.sort_by(|a, b| b.date.cmp(&a.date));
-    return Ok(projects);
+    Ok(projects)
 }
 
 #[server()]
 pub async fn get_project(name: String) -> Result<(String, String), ServerFnError> {
-    let mut path = PathBuf::from("./projects/file");
+    let mut path = std::path::PathBuf::from("./projects/file");
+
     path.set_file_name(name);
     path.set_extension("mdx");
-    let file =  tokio::fs::read_to_string(path).await
+    let file = tokio::fs::read_to_string(path)
+        .await
         .map_err(|_| ServerFnError::new("Not found"))?;
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
     let result = matter.parse(&file);
-    return Ok((
+    Ok((
         result.data.unwrap()["title"].as_string().unwrap(),
         markdown::to_html(&result.content),
-    ));
+    ))
 }
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Project {
@@ -83,9 +87,7 @@ pub fn Projects() -> impl IntoView {
         <Meta property="og:type" content="website"/>
         <div class="m-auto md:w-3/5 w-100 max-md:m-2  flex flex-col text-gray-400 ">
             <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 lg:grid-cols-2">
-                <Suspense fallback=move || {
-                    view! { <ProjectsPlaceholder/> }
-                }>
+                <Suspense>
                     {move || match once.get() {
                         None => view! { <ProjectsPlaceholder/> },
                         Some(data) => {
@@ -110,9 +112,7 @@ pub fn Projects() -> impl IntoView {
                                                             .into_iter()
                                                             .map(|n| {
                                                                 view! {
-                                                                    <p class="inline-block bg-slate-900 rounded m-1 p-1">
-                                                                        {n}
-                                                                    </p>
+                                                                    <p class="inline-block bg-slate-900 rounded m-1 p-1">{n}</p>
                                                                 }
                                                             })
                                                             .collect::<Vec<_>>()}
@@ -134,7 +134,7 @@ pub fn Projects() -> impl IntoView {
 }
 #[component]
 fn projects_placeholder() -> impl IntoView {
-        (0..6)
+    (0..6)
                                     .map(|_| {
                                         view! {
                                             <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950 animate-pulse">
@@ -166,46 +166,7 @@ pub fn Project() -> impl IntoView {
 
     view! {
         <div class="m-auto md:w-3/5 w-100 max-md:m-2 flex flex-col text-gray-400 ">
-            <Suspense fallback=move || {
-                view! {
-                    <div class="animate-pulse ">
-                        <div class="h-7 my-6 bg-gray-400 w-64 rounded"></div>
-                        <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
-                            <div class="flex items-center w-full">
-                                <div class="h-2.5 bg-gray-200 rounded-full bg-gray-700 w-32"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                            </div>
-                            <div class="flex items-center w-full max-w-[480px]">
-                                <div class="h-2.5 bg-gray-200 rounded-full bg-gray-700 w-full"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
-                            </div>
-                            <div class="flex items-center w-full max-w-[400px]">
-                                <div class="h-2.5 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-80"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                            </div>
-                            <div class="flex items-center w-full max-w-[480px]">
-                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-full"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
-                            </div>
-                            <div class="flex items-center w-full max-w-[440px]">
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-32"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-24"></div>
-                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-full"></div>
-                            </div>
-                            <div class="flex items-center w-full max-w-[360px]">
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                                <div class="h-2.5 ms-2 bg-gray-200 rounded-full bg-gray-700 w-80"></div>
-                                <div class="h-2.5 ms-2 bg-gray-300 rounded-full bg-gray-600 w-full"></div>
-                            </div>
-                            <span class="sr-only">Loading...</span>
-                        </div>
-                    </div>
-                }
-            }>
+            <Suspense>
                 {move || match resource.get() {
                     None => view! { <p>"Loading..."</p> }.into_view(),
                     Some(data) => {
@@ -247,10 +208,3 @@ pub fn Project() -> impl IntoView {
         </div>
     }
 }
-
-
-
-
-
-
-

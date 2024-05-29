@@ -28,6 +28,9 @@ pub fn App() -> impl IntoView {
             <div class="routing-progress">
                 <RoutingProgress is_routing max_time=std::time::Duration::from_millis(250)/>
             </div>
+            <div>
+
+            </div>
             <Navbar/>
             <main>
                 <Routes>
