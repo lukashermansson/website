@@ -15,6 +15,7 @@ pkgs.mkShell {
   buildInputs = [
     rust
   ] ++ (with pkgs; [
+    leptosfmt
     pkg-config
     cargo-leptos
     tailwindcss
