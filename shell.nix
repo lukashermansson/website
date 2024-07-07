@@ -2,7 +2,6 @@ let
   rust_overlay = import (builtins.fetchTarball "https://github.com/oxalica/rust-overlay/archive/master.tar.gz");
   pkgs = import <nixpkgs> { overlays = [ rust_overlay ]; };
   rustVersion = "latest";
-  #rustVersion = "1.62.0";
   rust = pkgs.rust-bin.nightly.${rustVersion}.default.override {
     extensions = [
       "rust-src" # for rust-analyzer
@@ -18,6 +17,7 @@ pkgs.mkShell {
     leptosfmt
     pkg-config
     cargo-leptos
+    cargo-expand
     tailwindcss
     # other dependencies
     #gtk3
