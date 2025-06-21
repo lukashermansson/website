@@ -1,8 +1,7 @@
-use crate::error_template::AppError;
-use crate::error_template::ErrorTemplate;
 use chrono::NaiveDate;
-use leptos::*;
-use leptos_router::{use_params_map, A};
+use leptos::prelude::*;
+use leptos_router::components::A;
+use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 #[server()]
 pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
@@ -78,18 +77,18 @@ pub struct Project {
 use leptos_meta::Meta;
 #[component]
 pub fn Projects() -> impl IntoView {
-    let once = create_resource(|| (), |_| async move { get_projects().await });
+    let once = Resource::new(|| (), |_| async move { get_projects().await });
     view! {
         <Title text="Lukas Hermansson"/>
         <Meta property="og:title" content="Projects"/>
         <Meta property="og:description" content="Lukas Hermansson's projects listing"/>
         <Meta property="og:image" content="https://www.lukashermansson.me/assets/og-card.jpg"/>
         <Meta property="og:type" content="website"/>
-        <div class="m-auto md:w-3/5 w-100 max-md:m-2  flex flex-col text-gray-400 ">
+        <div class="m-auto md:w-3/5 w-full max-md:m-2  flex flex-col text-gray-400 ">
             <div class="place-content-around grid mt-2 gap-4 grid-flow-row grid-cols-1 lg:grid-cols-2">
                 <Suspense>
                     {move || match once.get() {
-                        None => view! { <ProjectsPlaceholder/> },
+                        None => view! { <ProjectsPlaceholder/> }.into_any(),
                         Some(data) => {
                             view! {
                                 {data
@@ -100,12 +99,12 @@ pub fn Projects() -> impl IntoView {
                                             <div class="p-3 flex flex-col rounded shadow-md shadow-gray-950 bg-slate-800 rounded shadow-md shadow-gray-950">
                                                 <A href=n.url>
                                                     <h2 class="text-2xl font-bold">
-                                                        {&n.name}
+                                                        {n.name}
                                                         <span class="italic block float-right opacity-75 font-light ml-1">
-                                                            {&n.date.to_string()}
+                                                            {n.date.to_string()}
                                                         </span>
                                                     </h2>
-                                                    <p>{&n.description}</p>
+                                                    <p>{n.description}</p>
                                                     <div>
                                                         {n
                                                             .tags
@@ -123,7 +122,7 @@ pub fn Projects() -> impl IntoView {
                                     })
                                     .collect::<Vec<_>>()}
                             }
-                                .into_view()
+                                .into_any()
                         }
                     }}
 
@@ -161,23 +160,23 @@ use leptos_meta::Title;
 #[component]
 pub fn Project() -> impl IntoView {
     let params = use_params_map();
-    let id = move || params.with(|params| params.get("id").cloned()).unwrap();
-    let resource = create_blocking_resource(id, |arg| async move { get_project(arg).await });
+    let id = move || params.with(|params| params.get("id")).unwrap();
+    let resource = Resource::new_blocking(id, |arg| async move { get_project(arg).await });
 
     view! {
-        <div class="m-auto md:w-3/5 w-100 max-md:m-2 flex flex-col text-gray-400 ">
+        <div class="m-auto md:w-3/5 w-full max-md:m-2 flex flex-col text-gray-400 ">
             <Suspense>
                 {move || match resource.get() {
-                    None => view! { <p>"Loading..."</p> }.into_view(),
+                    None => view! { <p>"Loading..."</p> }.into_any(),
                     Some(data) => {
                         view! {
                             // the fallback receives a signal containing current errors
                             <ErrorBoundary fallback=|errors| {
-                                view! { <ErrorTemplate errors/> }
+                                view! { "" }.into_any()
                             }>
 
                                 {match data {
-                                    Err(_) => Err::<(), AppError>(AppError::NotFound).into_view(),
+                                    Err(_) => view!{"error"}.into_any(),
                                     Ok((title, data)) => {
                                         view! {
                                             <Meta property="og:title" content=format!("{}", &title)/>
@@ -194,13 +193,13 @@ pub fn Project() -> impl IntoView {
                                             <h1 class="text-4xl my-3 font-bold">{title}</h1>
                                             <div class="post" inner_html=data></div>
                                         }
-                                            .into_view()
+                                            .into_any()
                                     }
                                 }}
 
                             </ErrorBoundary>
                         }
-                            .into_view()
+                            .into_any()
                     }
                 }}
 

@@ -1,7 +1,5 @@
 pub mod app;
 pub mod error_template;
-#[cfg(feature = "ssr")]
-pub mod fileserv;
 pub mod navbar;
 pub mod projects;
 
@@ -10,6 +8,5 @@ pub mod projects;
 pub fn hydrate() {
     use crate::app::*;
     console_error_panic_hook::set_once();
-    leptos::mount_to_body(App);
+    leptos::mount::hydrate_body(App);
 }
-

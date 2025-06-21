@@ -1,45 +1,62 @@
-use crate::error_template::AppError;
-use crate::error_template::ErrorTemplate;
 use crate::navbar::Navbar;
 use crate::projects::Project;
 use crate::projects::Projects;
-use leptos::*;
-use leptos_meta::*;
+use leptos::prelude::*;
+use leptos_meta::provide_meta_context;
+use leptos_meta::Meta;
+use leptos_meta::MetaTags;
+use leptos_meta::Title;
+use leptos_router::components::FlatRoutes;
+use leptos_router::components::Route;
+use leptos_router::components::Router;
+use leptos_router::components::RoutingProgress;
 use leptos_router::*;
 
+pub fn shell(options: LeptosOptions) -> impl IntoView {
+    view! {
+        <!DOCTYPE html>
+        <html lang="en">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <AutoReload options=options.clone() />
+                <HydrationScripts options/>
+                <link rel="stylesheet" id="leptos" href="/pkg/website-2.css"/>
+                <MetaTags/>
+            </head>
+            <body class="bg-gray-900">
+                <App/>
+            </body>
+        </html>
+    }
+}
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
-    let (is_routing, set_is_routing) = create_signal(false);
+    let (is_routing, set_is_routing) = signal(false);
 
     view! {
-        <Stylesheet id="leptos" href="/pkg/website-2.css"/>
-        <Html lang="en"/>
         <Meta name="description" content="Lukas Hermansson's personal website"/>
         // sets the document title
         <Title text="Lukas Hermansson"/>
 
         <Router
-            fallback=|| {
-                let mut outside_errors = Errors::default();
-                outside_errors.insert_with_default_key(AppError::NotFound);
-                view! { <ErrorTemplate outside_errors/> }.into_view()
-            }
-
             set_is_routing
         >
             <div class="routing-progress">
-                <RoutingProgress is_routing max_time=std::time::Duration::from_millis(250)/>
+                <RoutingProgress is_routing max_time=std::time::Duration::from_millis(250) {..}
+
+            />
             </div>
             <div></div>
             <Navbar/>
             <main>
-                <Routes>
-                    <Route path="" view=HomePage/>
-                    <Route path="/projects" view=Projects/>
-                    <Route path="/projects/:id" view=Project/>
-                </Routes>
+                <FlatRoutes fallback=|| "Not found.">
+                    <Route path=StaticSegment("") view=HomePage/>
+                    <Route path=StaticSegment("projects") view=Projects/>
+                    <Route path=(StaticSegment("projects"), ParamSegment("id")) view=Project/>
+                </FlatRoutes>
             </main>
 
             <Footer/>
@@ -55,7 +72,7 @@ fn HomePage() -> impl IntoView {
         <Meta property="og:type" content="website"/>
         <Meta property="og:image" content="https://www.lukashermansson.me/assets/og-card.jpg"/>
         <Title text="Lukas Hermansson"/>
-        <div class="m-auto md:w-3/5 w-100 flex flex-col text-gray-400 ">
+        <div class="m-auto md:w-3/5 w-full flex flex-col text-gray-400 ">
             <h2 class="font-bold text-3xl text-center m-6">My code-values</h2>
             <div class="text-center">
                 <p class="m-2">
