@@ -3,7 +3,8 @@
   "name": "Lukas Hermansson",
   "icons": [
     {
-      "src": "/favicon.ico"
+      "src": "/assets/pwa-icon.svg",
+      "sizes": "any"
     }
   ],
   "start_url": ".",
