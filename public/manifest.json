@@ -3,7 +3,7 @@
   "name": "Lukas Hermansson",
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "/favicon.ico"
     }
   ],
   "start_url": ".",
