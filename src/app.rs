@@ -19,6 +19,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
             <head>
                 <meta charset="utf-8"/>
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <link rel="manifest" href="manifest.json" />
                 <AutoReload options=options.clone() />
                 <HydrationScripts options/>
                 <link rel="stylesheet" id="leptos" href="/pkg/website-2.css"/>
