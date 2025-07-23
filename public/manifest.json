@@ -4,7 +4,7 @@
   "icons": [
     {
       "src": "/favicon.ico",
-    },
+    }
   ],
   "start_url": ".",
   "display": "standalone",
