@@ -5,6 +5,8 @@ async fn main() {
     use leptos::logging::log;
     use leptos::prelude::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
+    use tower_http::compression::CompressionLayer;
+    use tower_http::compression::DefaultPredicate;
     use tower_http::services::ServeDir;
     use tower_http::services::ServeFile;
     use tower_http::trace::TraceLayer;
@@ -31,6 +33,12 @@ async fn main() {
     let addr = leptos_options.site_addr;
     let routes = generate_route_list(App);
 
+    let compression_layer: CompressionLayer = CompressionLayer::new()
+        .gzip(true)
+        .deflate(true)
+        .br(true)
+        .compress_when(DefaultPredicate::new());
+
     // build our application with a route
     let app = Router::new()
         .nest_service("/assets", ServeDir::new("public"))
@@ -48,7 +56,8 @@ async fn main() {
         })
         .fallback(leptos_axum::file_and_error_handler(shell))
         .with_state(leptos_options)
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(compression_layer);
 
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     log!("listening on http://{}", &addr);
