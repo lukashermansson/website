@@ -2661,6 +2661,7 @@ dependencies = [
  "leptos_router",
  "log",
  "markdown",
+ "mime",
  "serde",
  "thiserror 2.0.12",
  "tokio",

@@ -35,6 +35,13 @@ async fn main() {
     let app = Router::new()
         .nest_service("/assets", ServeDir::new("public"))
         .nest_service("/favicon.ico", ServeFile::new("public/favicon.ico"))
+        .nest_service(
+            "/manifest.json",
+            ServeFile::new_with_mime(
+                "public/manifest.json",
+                &"application/manifest+json".parse::<mime::Mime>().unwrap(),
+            ),
+        )
         .leptos_routes(&leptos_options, routes, {
             let leptos_options = leptos_options.clone();
             move || shell(leptos_options.clone())

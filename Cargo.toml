@@ -24,6 +24,7 @@ thiserror = "2"
 wasm-bindgen = { version = "=0.2.100" }
 tracing = { version = "0.1", optional = true }
 http = "1"
+mime = { version = "0.3.17", optional = true}
 serde = "1"
 chrono = { version = "0.4", features = ["serde"]}
 gray_matter = { version = "0.2", optional = true}
@@ -43,6 +44,7 @@ ssr = [
     "leptos_router/ssr",
     "dep:tracing",
     "dep:gray_matter",
+    "dep:mime",
     "dep:markdown",
     "dep:tracing-subscriber"
 ]
