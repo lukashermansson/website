@@ -4,7 +4,8 @@
   "icons": [
     {
       "src": "/assets/pwa-icon.svg",
-      "sizes": "any"
+      "sizes": "any",
+      "purpose": "maskable any"
     }
   ],
   "start_url": ".",
