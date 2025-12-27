@@ -5,6 +5,7 @@ use leptos_router::hooks::use_params_map;
 use serde::{Deserialize, Serialize};
 #[server()]
 pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
+    use gray_matter::ParsedEntity;
     let paths = std::fs::read_dir("./projects").unwrap();
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
@@ -14,8 +15,8 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
             .map(|p| async {
                 let f_entry = p.unwrap();
                 let content = tokio::fs::read_to_string(f_entry.path()).await.unwrap();
-                let result = matter.parse(&content);
-                let data = result.data.unwrap();
+                let result: ParsedEntity = matter.parse(&content).unwrap();
+                let data = result.data.as_ref().unwrap();
                 Project {
                     url: format!(
                         "/projects/{}",
@@ -51,6 +52,7 @@ pub async fn get_projects() -> Result<Vec<Project>, ServerFnError> {
 
 #[server()]
 pub async fn get_project(name: String) -> Result<(String, String), ServerFnError> {
+    use gray_matter::ParsedEntity;
     let mut path = std::path::PathBuf::from("./projects/file");
 
     path.set_file_name(name);
@@ -60,7 +62,7 @@ pub async fn get_project(name: String) -> Result<(String, String), ServerFnError
         .map_err(|_| ServerFnError::new("Not found"))?;
 
     let matter = gray_matter::Matter::<gray_matter::engine::YAML>::new();
-    let result = matter.parse(&file);
+    let result: ParsedEntity = matter.parse(&file).unwrap();
     Ok((
         result.data.unwrap()["title"].as_string().unwrap(),
         markdown::to_html(&result.content),
