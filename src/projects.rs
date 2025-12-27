@@ -171,7 +171,7 @@ pub fn Project() -> impl IntoView {
                     Some(data) => {
                         view! {
                             // the fallback receives a signal containing current errors
-                            <ErrorBoundary fallback=|errors| {
+                            <ErrorBoundary fallback=|_errors| {
                                 view! { "" }.into_any()
                             }>
 
